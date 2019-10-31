@@ -14,7 +14,6 @@
 #define COLS 3
 
 #define EMERGENCY_RELEASE_PIN 6
-#define TEST_PIN 9
 
 struct Keebe {
   const unsigned short int rowLength = ROWS;
@@ -41,12 +40,10 @@ void applyAction(Keebe kb, KState kstate);
 
 void setup() {
   pinMode(EMERGENCY_RELEASE_PIN, INPUT_PULLUP);
-  pinMode(TEST_PIN, OUTPUT);
   pinModeArray(kb.rowPin, kb.rowLength, OUTPUT);
   pinModeArray(kb.colPin, kb.colLength, INPUT_PULLUP);
   digitalWriteArray(kb.rowPin, kb.rowLength, HIGH);
   setupKState(kb, kstate);
-  Serial.begin(9600);
   Keyboard.begin();
 }
 
@@ -81,22 +78,13 @@ void setupKState(Keebe kb, KState &kstate) {
 }
 
 void readKeyboard(Keebe kb, KState &kstate) {
-  Serial.println("== readKeyboard ==");
   for (int i = 0; i < kb.rowLength; i++) {
     digitalWrite(kb.rowPin[i], LOW);
     for (int j = 0; j < kb.colLength; j++) {
       byte colValue = (byte) digitalRead(kb.colPin[j]);
       kstate.action[i][j] = calculateAction(colValue, kstate.logicalValue[i][j]);
-
-      Serial.print("["); Serial.print(i); Serial.print(","); Serial.print(j); Serial.print("]");
-      Serial.print(" n:"); Serial.print(colValue);
-      Serial.print(" b:"); Serial.print(kstate.logicalValue[i][j]);
-      Serial.print(" a:"); Serial.print(kstate.action[i][j]);
       kstate.logicalValue[i][j] = colValue;
-      Serial.print(" u:"); Serial.print(kstate.logicalValue[i][j]);
-      Serial.print("  ");
     }
-    Serial.println();
     digitalWrite(kb.rowPin[i], HIGH);
   }
 }
